@@ -1,0 +1,43 @@
+# === 認証情報・秘密情報（絶対にコミットしない） ===
+config/credentials.json
+config/token.json
+config/*.secret.json
+config/service_account.json
+config/service-account*.json
+config/client_secret*.json
+config/*-key.json
+config/*_key.json
+*.env
+.env
+.clasprc.json
+# 雛形は追跡する
+!config/*.example.json
+!.env.example
+
+# === データ（個人情報・キャッシュ）・ログ：.gitkeep のみ追跡 ===
+/data/*
+!/data/.gitkeep
+/logs/*
+!/logs/.gitkeep
+# プロジェクト内のデータ・ログも同様に除外
+projects/*/data/
+projects/*/logs/
+
+# === Python ===
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# === Node ===
+node_modules/
+
+# === Streamlit ===
+.streamlit/secrets.toml
+
+# === OS / エディタ ===
+.DS_Store
+Thumbs.db

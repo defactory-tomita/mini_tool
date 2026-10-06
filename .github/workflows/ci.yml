@@ -1,0 +1,38 @@
+name: CI
+
+# PR作成・更新時に、projects/ 配下で tests/ を持つプロジェクトのユニットテストを
+# プロジェクトごとに実行する（各プロジェクトは依存が独立しているため、
+# 1プロジェクトずつ requirements.txt を入れてから pytest する）。
+# 外部APIへの実通信を行わないテストのみのため、シークレットは不要。
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: プロジェクトごとにユニットテストを実行
+        run: |
+          shopt -s nullglob
+          found=0
+          for dir in projects/*/; do
+            [ -d "${dir}tests" ] || continue
+            found=1
+            echo "::group::${dir}"
+            python -m venv "/tmp/venv-$(basename "$dir")"
+            . "/tmp/venv-$(basename "$dir")/bin/activate"
+            pip install -q pytest
+            [ -f "${dir}requirements.txt" ] && pip install -q -r "${dir}requirements.txt"
+            (cd "$dir" && python -m pytest -q)
+            deactivate
+            echo "::endgroup::"
+          done
+          [ "$found" = 1 ] || echo "テスト対象のプロジェクトはまだありません"
